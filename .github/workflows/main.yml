@@ -26,13 +26,6 @@ jobs:
           echo "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> $GITHUB_ENV
           echo "PATH=$JAVA_HOME/bin:$PATH" >> $GITHUB_ENV
 
-      - name: Configure AIDL
-        run: |
-          AIDL_PATH=$(which aidl)
-          mkdir -p ~/.buildozer/android/platform/android-sdk/build-tools/31.0.0/
-          cp "$AIDL_PATH" ~/.buildozer/android/platform/android-sdk/build-tools/31.0.0/
-          chmod 777 ~/.buildozer/android/platform/android-sdk/build-tools/31.0.0/aidl
-
       - name: Build APK with Buildozer
         env:
           PATH: ${{ env.PATH }}
