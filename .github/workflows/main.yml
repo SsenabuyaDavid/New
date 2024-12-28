@@ -6,25 +6,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
-      - name: Buildozer dependencies
+      - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y git zip unzip python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev cmake libffi-dev libssl-dev automake autoconf automake libtool m4
-          pip install --user --upgrade Cython virtualenv
-          pip install --user --upgrade buildozer
-          echo 'export PATH=$PATH:~/.local/bin/' >> ~/.bashrc
+          sudo apt install -y \
+            git zip unzip python3-pip autoconf libtool pkg-config zlib1g-dev \
+            libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev \
+            libssl-dev automake openjdk-17-jdk
+          python3 -m pip install --upgrade --user Cython virtualenv buildozer
+          echo 'export PATH=$PATH:$HOME/.local/bin' >> $GITHUB_ENV
 
-      - name: Handle Java path
+      - name: Setup Java environment
         run: |
-          export JAVA_HOME=/usr/lib/jvm/temurin-17-jdk-amd64
-          sudo update-java-alternatives --set ${JAVA_HOME}
-          export PATH=$JAVA_HOME/bin:$PATH
-          yes | buildozer -v android debug
+          echo "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> $GITHUB_ENV
+          echo "PATH=$JAVA_HOME/bin:$PATH" >> $GITHUB_ENV
 
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+      - name: Build APK with Buildozer
+        env:
+          PATH: ${{ env.PATH }}
+        run: |
+          mkdir -p ~/.buildozer/android/platform
+          buildozer -v android debug
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v2
         with:
-          name: package
+          name: apk
           path: bin/*.apk
