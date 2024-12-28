@@ -26,6 +26,11 @@ jobs:
           echo "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> $GITHUB_ENV
           echo "PATH=$JAVA_HOME/bin:$PATH" >> $GITHUB_ENV
 
+      - name: Set environment variables
+        run: |
+          export ACLOCAL="aclocal -I /usr/share/aclocal"
+          export AUTOCONF_FLAGS="--force --warnings=none"
+          
       - name: Build APK with Buildozer
         env:
           PATH: ${{ env.PATH }}
